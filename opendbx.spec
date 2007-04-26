@@ -2,7 +2,7 @@ Summary:	Extensible database access library
 Name:		opendbx
 Version:	1.2.2
 Release:	1
-License:	GPL
+License:	LGPL
 Group:		Libraries
 Source0:	http://linuxnetworks.de/opendbx/download/%{name}-%{version}.tar.gz
 # Source0-md5:	4a420ff46c3eca6fac63d1066d83e4ad
