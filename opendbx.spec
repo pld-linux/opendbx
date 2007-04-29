@@ -1,4 +1,5 @@
 Summary:	Extensible database access library
+Summary(pl.UTF-8):	Rozszerzana biblioteka dostępu do baz danych
 Name:		opendbx
 Version:	1.2.2
 Release:	1
@@ -24,77 +25,121 @@ leads to an elegant code design automatically. If you want your
 application to support different databases with little effort, this is
 definitively the right thing for you!
 
+%description -l pl.UTF-8
+OpenDBX to skrajnie lekka, ale rozszerzalna biblioteka dostępu do baz
+danych napisana w C. Udostępnia warstwę abstrakcji dla wszystkich
+obsługiwanych baz danych w jednym, przejrzystym i prostym interfejsie
+automatycznie prowadzącym do eleganckiego projektu kodu. Jest to
+odpowiednia biblioteka, aby małym nakładem pracy aplikacja obsługiwała
+różne bazy danych.
+
 %package devel
-Summary:	Header files and develpment documentation for opendbx
+Summary:	Header files for opendbx
+Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki opendbx
 Group:		Development/Libraries
-Requires:	%{name} = %{epoch}:%{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
 
 %description devel
-Header files and develpment documentation for opendbx.
+Header files for opendbx.
+
+%description devel -l pl.UTF-8
+Pliki nagłówkowe biblioteki opendbx.
 
 %package static
 Summary:	Static opendbx library
+Summary(pl.UTF-8):	Statyczna biblioteka opendbx
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
+Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
 Static opendbx library.
 
+%description static -l pl.UTF-8
+Statyczna biblioteka opendbx.
+
 %package backend-firebird
 Summary:	Firebird backend for opendbx
+Summary(pl.UTF-8):	Backend bazy danych Firebird dla biblioteki opendbx
 Group:		Libraries
-Requires:	%{name} = %{epoch}:%{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
 
 %description backend-firebird
 Firebird backend for opendbx.
 
+%description backend-firebird -l pl.UTF-8
+Backend bazy danych Firebird dla biblioteki opendbx.
+
 %package backend-mssql
-Summary:	mssql backend for opendbx
+Summary:	MS SQL backend for opendbx
+Summary(pl.UTF-8):	Backend bazy danych MS SQL dla biblioteki opendbx
 Group:		Libraries
-Requires:	%{name} = %{epoch}:%{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
 
 %description backend-mssql
-mssql backend for opendbx.
+MS SQL backend for opendbx.
+
+%description backend-mssql -l pl.UTF-8
+Backend bazy danych MS SQL dla biblioteki opendbx.
 
 %package backend-mysql
-Summary:	mysql backend for opendbx
+Summary:	MySQL backend for opendbx
+Summary(pl.UTF-8):	Backend bazy danych MySQL dla biblioteki opendbx
 Group:		Libraries
-Requires:	%{name} = %{epoch}:%{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
 
 %description backend-mysql
-mysql backend for opendbx.
+MySQL backend for opendbx.
+
+%description backend-mysql -l pl.UTF-8
+Backend bazy danych MySQL dla biblioteki opendbx.
 
 %package backend-postgres
 Summary:	PostgreSQL backend for opendbx
+Summary(pl.UTF-8):	Backend bazy danych PostgreSQL dla biblioteki opendbx
 Group:		Libraries
-Requires:	%{name} = %{epoch}:%{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
 
 %description backend-postgres
 PostgreSQL backend for opendbx.
 
+%description backend-postgres -l pl.UTF-8
+Backend bazy danych PostgreSQL dla biblioteki opendbx.
+
 %package backend-sqlite3
 Summary:	sqlite3 backend for opendbx
+Summary(pl.UTF-8):	Backend bazy danych sqlite3 dla biblioteki opendbx
 Group:		Libraries
-Requires:	%{name} = %{epoch}:%{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
 
 %description backend-sqlite3
 sqlite3 backend for opendbx.
 
+%description backend-sqlite3 -l pl.UTF-8
+Backend bazy danych sqlite3 dla biblioteki opendbx.
+
 %package backend-sqlite
 Summary:	sqlite backend for opendbx
+Summary(pl.UTF-8):	Backend bazy danych sqlite dla biblioteki opendbx
 Group:		Libraries
-Requires:	%{name} = %{epoch}:%{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
 
 %description backend-sqlite
 sqlite backend for opendbx.
 
+%description backend-sqlite -l pl.UTF-8
+Backend bazy danych sqlite dla biblioteki opendbx.
+
 %package backend-sybase
 Summary:	sybase backend for opendbx
+Summary(pl.UTF-8):	Backend bazy danych sybase dla biblioteki opendbx
 Group:		Libraries
-Requires:	%{name} = %{epoch}:%{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
 
 %description backend-sybase
 sybase backend for opendbx.
+
+%description backend-sybase -l pl.UTF-8
+Backend bazy danych sybase dla biblioteki opendbx.
 
 %prep
 %setup -q
