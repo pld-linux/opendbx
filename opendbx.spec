@@ -1,12 +1,12 @@
 Summary:	Extensible database access library
 Summary(pl.UTF-8):	Rozszerzana biblioteka dostępu do baz danych
 Name:		opendbx
-Version:	1.2.2
+Version:	1.2.3
 Release:	1
 License:	LGPL
 Group:		Libraries
 Source0:	http://linuxnetworks.de/opendbx/download/%{name}-%{version}.tar.gz
-# Source0-md5:	4a420ff46c3eca6fac63d1066d83e4ad
+# Source0-md5:	7700924e9400ae5e19758d947b01b789
 URL:		http://www.linuxnetworks.de/doc/index.php/OpenDBX
 BuildRequires:	Firebird-devel
 BuildRequires:	freetds-devel
