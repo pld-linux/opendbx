@@ -2,7 +2,7 @@ Summary:	Extensible database access library
 Summary(pl.UTF-8):	Rozszerzana biblioteka dostępu do baz danych
 Name:		opendbx
 Version:	1.2.3
-Release:	1
+Release:	2
 License:	LGPL
 Group:		Libraries
 Source0:	http://linuxnetworks.de/opendbx/download/%{name}-%{version}.tar.gz
