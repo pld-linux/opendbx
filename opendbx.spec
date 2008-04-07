@@ -1,4 +1,11 @@
-Summary:	Extensible database access library
+#
+# Conditional build:
+%bcond_without	ibase		# don't build ibase (InterBase/Firebird) backend
+
+%ifnarch %{ix86} %{x8664} sparc sparcv9 alpha ppc
+%undefine	with_ibase
+%endif
+
 Summary(pl.UTF-8):	Rozszerzana biblioteka dostępu do baz danych
 Name:		opendbx
 Version:	1.2.3
@@ -8,7 +15,7 @@ Group:		Libraries
 Source0:	http://linuxnetworks.de/opendbx/download/%{name}-%{version}.tar.gz
 # Source0-md5:	7700924e9400ae5e19758d947b01b789
 URL:		http://www.linuxnetworks.de/doc/index.php/OpenDBX
-BuildRequires:	Firebird-devel
+%{?with_ibase:BuildRequires:	Firebird-devel}
 BuildRequires:	freetds-devel
 BuildRequires:	mysql-devel
 BuildRequires:	postgresql-devel
@@ -147,7 +154,7 @@ Backend bazy danych sybase dla biblioteki opendbx.
 %build
 CPPFLAGS="-I/usr/include/mysql"; export CPPFLAGS
 %configure \
-	--with-backends="firebird mssql mysql pgsql sqlite sqlite3 sybase"
+	--with-backends="%{?with_ibase:firebird} mssql mysql pgsql sqlite sqlite3 sybase"
 %{__make}
 
 %install
@@ -183,10 +190,12 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %{_libdir}/lib*.a
 
+%if %{with ibase}
 %files backend-firebird
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/%{name}/libfirebird*.so.*
 %{_libdir}/%{name}/libfirebird*.la
+%endif
 
 %files backend-mssql
 %defattr(644,root,root,755)
