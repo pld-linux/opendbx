@@ -6,14 +6,15 @@
 %undefine	with_ibase
 %endif
 
+Summary:	Extensible library for database access
 Summary(pl.UTF-8):	Rozszerzana biblioteka dostępu do baz danych
 Name:		opendbx
-Version:	1.2.3
-Release:	6
+Version:	1.4.6
+Release:	1
 License:	LGPL
 Group:		Libraries
 Source0:	http://linuxnetworks.de/opendbx/download/%{name}-%{version}.tar.gz
-# Source0-md5:	7700924e9400ae5e19758d947b01b789
+# Source0-md5:	3e89d7812ce4a28046bd60d5f969263d
 URL:		http://www.linuxnetworks.de/doc/index.php/OpenDBX
 %{?with_ibase:BuildRequires:	Firebird-devel}
 BuildRequires:	freetds-devel
@@ -23,6 +24,8 @@ BuildRequires:	sqlite-devel
 BuildRequires:	sqlite3-devel
 BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		skip_post_check_so	libmssqlbackend.so.1.2.0
 
 %description
 OpenDBX is an extremely lightweight but extensible database access
@@ -173,15 +176,56 @@ rm -rf $RPM_BUILD_ROOT
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
+%post backend-firebird
+/sbin/ldconfig -n %{_libdir}/%{name}
+
+%postun backend-firebird
+/sbin/ldconfig -n %{_libdir}/%{name}
+
+%post backend-mssql
+/sbin/ldconfig -n %{_libdir}/%{name}
+
+%postun backend-mssql
+/sbin/ldconfig -n %{_libdir}/%{name}
+
+%post backend-mysql
+/sbin/ldconfig -n %{_libdir}/%{name}
+
+%postun backend-mysql
+/sbin/ldconfig -n %{_libdir}/%{name}
+
+%post backend-postgres
+/sbin/ldconfig -n %{_libdir}/%{name}
+
+%postun backend-postgres
+/sbin/ldconfig -n %{_libdir}/%{name}
+
+%post backend-sqlite3
+/sbin/ldconfig -n %{_libdir}/%{name}
+
+%postun backend-sqlite
+/sbin/ldconfig -n %{_libdir}/%{name}
+
+%post backend-sybase
+/sbin/ldconfig -n %{_libdir}/%{name}
+
+%postun backend-sybase
+/sbin/ldconfig -n %{_libdir}/%{name}
+
 %files -f %{name}.lang
 %defattr(644,root,root,755)
 %doc doc/* AUTHORS ChangeLog README TODO
+%attr(755,root,root) %{_bindir}/odbx-sql
 %attr(755,root,root) %{_libdir}/lib*.so.*.*
+%attr(755,root,root) %ghost %{_libdir}/lib*.so.1
+%dir %{_datadir}/%{name}
+%{_datadir}/%{name}/keywords
 %dir %{_libdir}/%{name}
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/lib*.so
+%{_includedir}/opendbx
 %{_includedir}/*.h
 %{_libdir}/*.la
 %{_pkgconfigdir}/*.pc
@@ -193,36 +237,50 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with ibase}
 %files backend-firebird
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libfirebird*.so.*
+%attr(755,root,root) %{_libdir}/%{name}/libfirebird*.so.*.*
+%attr(755,root,root) %ghost %{_libdir}/%{name}/libfirebird*.so.1
+%attr(755,root,root) %{_libdir}/%{name}/libfirebird*.so
 %{_libdir}/%{name}/libfirebird*.la
 %endif
 
 %files backend-mssql
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libmssql*.so.*
+%attr(755,root,root) %{_libdir}/%{name}/libmssql*.so.*.*
+%attr(755,root,root) %ghost %{_libdir}/%{name}/libmssql*.so.1
+%attr(755,root,root) %{_libdir}/%{name}/libmssql*.so
 %{_libdir}/%{name}/libmssql*.la
 
 %files backend-mysql
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libmysql*.so.*
+%attr(755,root,root) %{_libdir}/%{name}/libmysql*.so.*.*
+%attr(755,root,root) %ghost %{_libdir}/%{name}/libmysql*.so.1
+%attr(755,root,root) %{_libdir}/%{name}/libmysql*.so
 %{_libdir}/%{name}/libmysql*.la
 
 %files backend-postgres
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libpgsql*.so.*
+%attr(755,root,root) %{_libdir}/%{name}/libpgsql*.so.*.*
+%attr(755,root,root) %ghost %{_libdir}/%{name}/libpgsql*.so.1
+%attr(755,root,root) %{_libdir}/%{name}/libpgsql*.so
 %{_libdir}/%{name}/libpgsql*.la
 
 %files backend-sqlite3
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libsqlite3*.so.*
+%attr(755,root,root) %{_libdir}/%{name}/libsqlite3*.so.*.*
+%attr(755,root,root) %ghost %{_libdir}/%{name}/libsqlite3*.so.1
+%attr(755,root,root) %{_libdir}/%{name}/libsqlite3*.so
 %{_libdir}/%{name}/libsqlite3*.la
 
 %files backend-sqlite
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libsqlite*.so.*
-%{_libdir}/%{name}/libsqlite*.la
+%attr(755,root,root) %{_libdir}/%{name}/libsqliteb*.so.*.*
+%attr(755,root,root) %ghost %{_libdir}/%{name}/libsqliteb*.so.1
+%attr(755,root,root) %{_libdir}/%{name}/libsqliteb*.so
+%{_libdir}/%{name}/libsqliteb*.la
 
 %files backend-sybase
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libsybase*.so.*
+%attr(755,root,root) %{_libdir}/%{name}/libsybase*.so.*.*
+%attr(755,root,root) %ghost %{_libdir}/%{name}/libsybase*.so.1
+%attr(755,root,root) %{_libdir}/%{name}/libsybase*.so
 %{_libdir}/%{name}/libsybase*.la
