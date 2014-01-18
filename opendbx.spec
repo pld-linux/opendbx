@@ -1,6 +1,8 @@
 #
 # Conditional build:
-%bcond_without	ibase		# don't build ibase (InterBase/Firebird) backend
+%bcond_without	ibase		# ibase (InterBase/Firebird) backend
+%bcond_with	oracle		# oracle backend [BR: libclntsh or liboci + oci.h]
+%bcond_without	static_libs	# static library
 
 %ifnarch %{ix86} %{x8664} sparc sparcv9 alpha ppc
 %undefine	with_ibase
@@ -11,21 +13,22 @@ Summary(pl.UTF-8):	Rozszerzana biblioteka dostępu do baz danych
 Name:		opendbx
 Version:	1.4.6
 Release:	1
-License:	LGPL
+License:	LGPL v2+
 Group:		Libraries
 Source0:	http://linuxnetworks.de/opendbx/download/%{name}-%{version}.tar.gz
 # Source0-md5:	3e89d7812ce4a28046bd60d5f969263d
+Patch0:		%{name}-tds.patch
 URL:		http://www.linuxnetworks.de/doc/index.php/OpenDBX
 %{?with_ibase:BuildRequires:	Firebird-devel}
+BuildRequires:	libstdc++-devel
 BuildRequires:	freetds-devel
 BuildRequires:	mysql-devel
 BuildRequires:	postgresql-devel
 BuildRequires:	sqlite-devel
 BuildRequires:	sqlite3-devel
+BuildRequires:	unixODBC-devel
 BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
-%define		skip_post_check_so	libmssqlbackend.so.1.2.0
 
 %description
 OpenDBX is an extremely lightweight but extensible database access
@@ -67,6 +70,17 @@ Static opendbx library.
 %description static -l pl.UTF-8
 Statyczna biblioteka opendbx.
 
+%package apidocs
+Summary:	API documentation for opendbx library
+Summary(pl.UTF-8):	Dokumentacja API biblioteki opendbx
+Group:		Documentation
+
+%description apidocs
+API documentation for opendbx library.
+
+%description apidocs -l pl.UTF-8
+Dokumentacja API biblioteki opendbx.
+
 %package backend-firebird
 Summary:	Firebird backend for opendbx
 Summary(pl.UTF-8):	Backend bazy danych Firebird dla biblioteki opendbx
@@ -102,6 +116,30 @@ MySQL backend for opendbx.
 
 %description backend-mysql -l pl.UTF-8
 Backend bazy danych MySQL dla biblioteki opendbx.
+
+%package backend-odbc
+Summary:	ODBC backend for opendbx
+Summary(pl.UTF-8):	Backend baz danych ODBC dla biblioteki opendbx
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description backend-odbc
+ODBC backend for opendbx.
+
+%description backend-odbc -l pl.UTF-8
+Backend baz danych ODBC dla biblioteki opendbx.
+
+%package backend-oracle
+Summary:	Oracle backend for opendbx
+Summary(pl.UTF-8):	Backend bazy danych Oracle dla biblioteki opendbx
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description backend-oracle
+Oracle backend for opendbx.
+
+%description backend-oracle -l pl.UTF-8
+Backend bazy danych Oracle dla biblioteki opendbx.
 
 %package backend-postgres
 Summary:	PostgreSQL backend for opendbx
@@ -153,11 +191,13 @@ Backend bazy danych sybase dla biblioteki opendbx.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
-CPPFLAGS="-I/usr/include/mysql"; export CPPFLAGS
+CPPFLAGS="%{rpmcppflags} -I/usr/include/mysql"
 %configure \
-	--with-backends="%{?with_ibase:firebird} mssql mysql pgsql sqlite sqlite3 sybase"
+	%{!?with_static_libs:--disable-static} \
+	--with-backends="%{?with_ibase:firebird} mssql mysql odbc %{?with_oracle:oracle} pgsql sqlite sqlite3 sybase"
 %{__make}
 
 %install
@@ -166,9 +206,13 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-%find_lang %{name}
+# opendbx and opendbx-utils domains
+%find_lang %{name} --all-name
 
-rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/*.a
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/%{name}/*.la
+%if %{with static_libs}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/%{name}/*.a
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -176,111 +220,79 @@ rm -rf $RPM_BUILD_ROOT
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%post backend-firebird
-/sbin/ldconfig -n %{_libdir}/%{name}
-
-%postun backend-firebird
-/sbin/ldconfig -n %{_libdir}/%{name}
-
-%post backend-mssql
-/sbin/ldconfig -n %{_libdir}/%{name}
-
-%postun backend-mssql
-/sbin/ldconfig -n %{_libdir}/%{name}
-
-%post backend-mysql
-/sbin/ldconfig -n %{_libdir}/%{name}
-
-%postun backend-mysql
-/sbin/ldconfig -n %{_libdir}/%{name}
-
-%post backend-postgres
-/sbin/ldconfig -n %{_libdir}/%{name}
-
-%postun backend-postgres
-/sbin/ldconfig -n %{_libdir}/%{name}
-
-%post backend-sqlite3
-/sbin/ldconfig -n %{_libdir}/%{name}
-
-%postun backend-sqlite
-/sbin/ldconfig -n %{_libdir}/%{name}
-
-%post backend-sybase
-/sbin/ldconfig -n %{_libdir}/%{name}
-
-%postun backend-sybase
-/sbin/ldconfig -n %{_libdir}/%{name}
-
 %files -f %{name}.lang
 %defattr(644,root,root,755)
-%doc doc/* AUTHORS ChangeLog README TODO
+%doc AUTHORS ChangeLog README TODO
 %attr(755,root,root) %{_bindir}/odbx-sql
-%attr(755,root,root) %{_libdir}/lib*.so.*.*
-%attr(755,root,root) %ghost %{_libdir}/lib*.so.1
+%attr(755,root,root) %{_libdir}/libopendbx.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libopendbx.so.1
+%attr(755,root,root) %{_libdir}/libopendbxplus.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libopendbxplus.so.1
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/keywords
 %dir %{_libdir}/%{name}
+%{_mandir}/man1/odbx-sql.1*
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so
+%attr(755,root,root) %{_libdir}/libopendbx.so
+%attr(755,root,root) %{_libdir}/libopendbxplus.so
+%{_libdir}/libopendbx.la
+%{_libdir}/libopendbxplus.la
+%{_includedir}/odbx.h
 %{_includedir}/opendbx
-%{_includedir}/*.h
-%{_libdir}/*.la
-%{_pkgconfigdir}/*.pc
+%{_pkgconfigdir}/opendbx.pc
+%{_pkgconfigdir}/opendbxplus.pc
+%{_mandir}/man3/OpenDBX*.3*
+%{_mandir}/man3/odbx_*.3*
 
+%if %{with static_libs}
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/lib*.a
+%{_libdir}/libopendbx.a
+%{_libdir}/libopendbxplus.a
+%endif
+
+%files apidocs
+%defattr(644,root,root,755)
+%doc doc/html/*
 
 %if %{with ibase}
 %files backend-firebird
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libfirebird*.so.*.*
-%attr(755,root,root) %ghost %{_libdir}/%{name}/libfirebird*.so.1
-%attr(755,root,root) %{_libdir}/%{name}/libfirebird*.so
-%{_libdir}/%{name}/libfirebird*.la
+%attr(755,root,root) %{_libdir}/%{name}/libfirebirdbackend.so*
 %endif
 
 %files backend-mssql
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libmssql*.so.*.*
-%attr(755,root,root) %ghost %{_libdir}/%{name}/libmssql*.so.1
-%attr(755,root,root) %{_libdir}/%{name}/libmssql*.so
-%{_libdir}/%{name}/libmssql*.la
+%attr(755,root,root) %{_libdir}/%{name}/libmssqlbackend.so*
 
 %files backend-mysql
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libmysql*.so.*.*
-%attr(755,root,root) %ghost %{_libdir}/%{name}/libmysql*.so.1
-%attr(755,root,root) %{_libdir}/%{name}/libmysql*.so
-%{_libdir}/%{name}/libmysql*.la
+%attr(755,root,root) %{_libdir}/%{name}/libmysqlbackend.so*
+
+%files backend-odbc
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/%{name}/libodbcbackend.so*
+
+%if %{with oracle}
+%files backend-oracle
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/%{name}/liboraclebackend.so*
+%endif
 
 %files backend-postgres
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libpgsql*.so.*.*
-%attr(755,root,root) %ghost %{_libdir}/%{name}/libpgsql*.so.1
-%attr(755,root,root) %{_libdir}/%{name}/libpgsql*.so
-%{_libdir}/%{name}/libpgsql*.la
+%attr(755,root,root) %{_libdir}/%{name}/libpgsqlbackend.so*
 
 %files backend-sqlite3
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libsqlite3*.so.*.*
-%attr(755,root,root) %ghost %{_libdir}/%{name}/libsqlite3*.so.1
-%attr(755,root,root) %{_libdir}/%{name}/libsqlite3*.so
-%{_libdir}/%{name}/libsqlite3*.la
+%attr(755,root,root) %{_libdir}/%{name}/libsqlite3backend.so*
 
 %files backend-sqlite
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libsqliteb*.so.*.*
-%attr(755,root,root) %ghost %{_libdir}/%{name}/libsqliteb*.so.1
-%attr(755,root,root) %{_libdir}/%{name}/libsqliteb*.so
-%{_libdir}/%{name}/libsqliteb*.la
+%attr(755,root,root) %{_libdir}/%{name}/libsqlitebackend.so*
 
 %files backend-sybase
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/%{name}/libsybase*.so.*.*
-%attr(755,root,root) %ghost %{_libdir}/%{name}/libsybase*.so.1
-%attr(755,root,root) %{_libdir}/%{name}/libsybase*.so
-%{_libdir}/%{name}/libsybase*.la
+%attr(755,root,root) %{_libdir}/%{name}/libsybasebackend.so*

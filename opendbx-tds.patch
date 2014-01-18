@@ -1,0 +1,20 @@
+Asynchronous interface (dbpoll() etc.) is not implemented in freetds;
+just ignore timeout argument (like most backends do) and wait synchronously on dbsqlok().
+--- opendbx-1.4.6/backends/mssql/mssql_basic.c.orig	2014-01-18 14:02:53.684519942 +0100
++++ opendbx-1.4.6/backends/mssql/mssql_basic.c	2014-01-18 14:02:56.857853141 +0100
+@@ -316,6 +316,7 @@
+ 
+ 	if( caux->firstresult )
+ 	{
++#ifdef HAVE_DBPOLL
+ 		long ms = -1;
+ 		int reason = DBRESULT;
+ 		DBPROCESS* cdbproc;
+@@ -323,6 +324,7 @@
+ 		if( timeout != NULL ) { ms = timeout->tv_sec * 1000 + timeout->tv_usec / 1000; }
+ 		if( dbpoll( dbproc, ms, &cdbproc, &reason ) == FAIL ) { return -ODBX_ERR_BACKEND; }
+ 		if( reason != DBRESULT ) { return ODBX_RES_TIMEOUT; }   // timeout
++#endif
+ 
+ 		caux->firstresult = 0;
+ 		if( dbsqlok( dbproc ) == FAIL ) { return -ODBX_ERR_BACKEND; }
