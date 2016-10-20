@@ -12,14 +12,16 @@ Summary:	Extensible library for database access
 Summary(pl.UTF-8):	Rozszerzana biblioteka dostępu do baz danych
 Name:		opendbx
 Version:	1.4.6
-Release:	2
+Release:	4
 License:	LGPL v2+
 Group:		Libraries
 Source0:	http://linuxnetworks.de/opendbx/download/%{name}-%{version}.tar.gz
 # Source0-md5:	3e89d7812ce4a28046bd60d5f969263d
 Patch0:		%{name}-tds.patch
+Patch1:		doxygen-update.patch
 URL:		http://www.linuxnetworks.de/doc/index.php/OpenDBX
 %{?with_ibase:BuildRequires:	Firebird-devel}
+BuildRequires:	docbook2X
 BuildRequires:	libstdc++-devel
 BuildRequires:	freetds-devel
 BuildRequires:	mysql-devel
@@ -192,6 +194,10 @@ Backend bazy danych sybase dla biblioteki opendbx.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
+
+# To fix Doxygen parsing issue
+ln -s api lib/%{name}/api.dox
 
 %build
 CPPFLAGS="%{rpmcppflags} -I/usr/include/mysql"
