@@ -193,8 +193,8 @@ Backend bazy danych sybase dla biblioteki opendbx.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
+%patch -P0 -p1
+%patch -P1 -p1
 
 # To fix Doxygen parsing issue
 ln -s api lib/%{name}/api.dox
